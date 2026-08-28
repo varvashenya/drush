@@ -3,27 +3,20 @@
 namespace Drush\Tests\Make\Parser;
 
 use Drush\Make\Parser\ParserIni;
-
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase;
 
-/**
- * @coversDefaultClass \Drush\Make\Parser\ParserIni
- */
+#[CoversClass(ParserIni::class)]
 class ParserIniTest extends TestCase {
 
-  /**
-   * @covers ::supportedFile
-   */
   public function testSupportedFile() {
     $this->assertFalse(ParserIni::supportedFile('-'));
     $this->assertFalse(ParserIni::supportedFile('/tmp/foo/bar/baz.make.yml'));
     $this->assertTrue(ParserIni::supportedFile('./baz/foo.make'));
   }
 
-  /**
-   * @dataProvider providerParse
-   * @covers ::parse
-   */
+  #[DataProvider('providerParse')]
   public function testParse($ini, $expected) {
     $parsed = ParserIni::parse($ini);
     $this->assertSame($expected, $parsed);

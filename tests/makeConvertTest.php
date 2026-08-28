@@ -23,8 +23,6 @@ class makeConvertTest extends CommandUnishTestCase {
    *
    * @param $expected_lines
    *   An array of lines expected to be present in the command output.
-   *
-   * @dataProvider providerTestMakeConvert
    */
   #[DataProvider('providerTestMakeConvert')]
   public function testMakeConvert($source_filename, $options, $expected_lines) {

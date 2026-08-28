@@ -14,8 +14,6 @@ class xhUnitTest extends UnitUnishTestCase {
 
   /**
    * Test various combinations of XHProf flag options.
-   *
-   * @dataProvider xhOptionProvider
    */
   #[DataProvider('xhOptionProvider')]
   public function testFlags($name, $options, $expected) {
