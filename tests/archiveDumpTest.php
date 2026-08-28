@@ -2,15 +2,17 @@
 
 namespace Unish;
 
+
+use PHPUnit\Framework\Attributes\Group;
 require_once dirname(__FILE__) . '/../includes/context.inc';
 require_once dirname(__FILE__) . '/../includes/filesystem.inc';
 
 /**
  * Tests for archive-dump and archive-restore
  *
- * @group commands
  */
-class archiveDumpCase extends CommandUnishTestCase {
+#[Group('commands')]
+class archiveDumpTest extends CommandUnishTestCase {
   /**
    * archive-dump behaves slightly different when archiving a site installed
    * at sites/default so we make the test to use sites/default as the

@@ -32,7 +32,7 @@ class ParserIniTest extends TestCase {
   /**
    * Provides INI snippets to test the parser.
    */
-  public function providerParse() {
+  public static function providerParse() {
     $snippets[] = array('foo[bar][baz] = one', array('foo' => array('bar' => array('baz' => 'one'))));
     $snippets[] = array("; A comment should not be part of the returned array\nprojects[] = drupal", array('projects' => array('drupal')));
 

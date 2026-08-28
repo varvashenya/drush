@@ -33,7 +33,7 @@ class ParserYamlTest extends TestCase {
   /**
    * Provides YAML snippets to test the parser.
    */
-  public function providerParse() {
+  public static function providerParse() {
     $yaml = <<<'YAML'
 foo:
   bar:
