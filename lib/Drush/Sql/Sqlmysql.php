@@ -2,7 +2,6 @@
 
 namespace Drush\Sql;
 
-use Drush\Log\LogLevel;
 use PDO;
 use Symfony\Component\Process\Process;
 
@@ -123,14 +122,17 @@ EOT;
    * Deprecated program name" notice) end up in the list as bogus table names.
    *
    * @return string[]
-   *   The table names. An empty array if the query fails.
+   *   The table names. An empty array if the query fails, in which case a
+   *   Drush error is also set so that the command exits with a failure status.
    */
   public function listTables() {
+    // The --extra option is deliberately not passed along. It carries options
+    // for the command being run (e.g. mysqldump flags for sql-dump), which the
+    // mysql client may reject.
     $command = implode(' ', array_filter([
       $this->command(),
       $this->creds(),
       $this->silent(),
-      drush_get_option('extra', $this->query_extra),
     ]));
 
     $process = Process::fromShellCommandline($command);
@@ -139,12 +141,29 @@ EOT;
     $process->run();
 
     if (!$process->isSuccessful()) {
-      drush_log(dt('Failed to list tables: !error', ['!error' => trim($process->getErrorOutput())]), LogLevel::WARNING);
+      drush_set_error('DRUSH_SQL_LIST_TABLES_FAILED', dt('Failed to list tables: !error', ['!error' => trim($process->getErrorOutput())]));
       return [];
     }
 
-    $tables = preg_split('/\R/', $process->getOutput(), -1, PREG_SPLIT_NO_EMPTY);
-    return array_map('rtrim', $tables);
+    return $this->parseTableList($process->getOutput());
+  }
+
+  /**
+   * Parse the output of "SHOW TABLES" into a list of table names.
+   *
+   * Lines are split on "\n" or "\r\n" only. PCRE's \R must not be used here: in
+   * non-UTF mode it also matches the single byte 0x85, which is part of the
+   * UTF-8 encoding of characters such as "Å" (C3 85) and would split table
+   * names containing them.
+   *
+   * @param string $output
+   *   The standard output of the client.
+   *
+   * @return string[]
+   *   The table names.
+   */
+  protected function parseTableList($output) {
+    return preg_split('/\r?\n/', $output, -1, PREG_SPLIT_NO_EMPTY);
   }
 
   public function listTablesQuoted() {
