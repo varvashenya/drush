@@ -23,6 +23,23 @@ executors:
           - MYSQL_HOST=127.0.0.1
           - UNISH_DB_URL=mysql://root:@127.0.0.1
       - image: cimg/mariadb:11.4
+  # Experimental: PHP 8.4 and 8.5 are not expected to pass yet. They run in the
+  # separate "experimental_php" workflow so that failures do not affect the
+  # main build_test workflow.
+  linux84:
+    docker:
+      - image: wodby/php:8.4
+        environment:
+          - MYSQL_HOST=127.0.0.1
+          - UNISH_DB_URL=mysql://root:@127.0.0.1
+      - image: cimg/mysql:8.0
+  linux85:
+    docker:
+      - image: wodby/php:8.5
+        environment:
+          - MYSQL_HOST=127.0.0.1
+          - UNISH_DB_URL=mysql://root:@127.0.0.1
+      - image: cimg/mysql:8.0
 
 commands:
   prepare_php:
@@ -69,3 +86,16 @@ workflows:
           name: test-drupal-7-php-8.3-mariadb
           drupal: "7"
           os: linux83-mariadb
+
+  # Experimental: informational only, expected to fail until Drush 8 and
+  # Drupal 7 support these PHP versions.
+  experimental_php:
+    jobs:
+      - test:
+          name: test-drupal-7-php-8.4
+          drupal: "7"
+          os: linux84
+      - test:
+          name: test-drupal-7-php-8.5
+          drupal: "7"
+          os: linux85
