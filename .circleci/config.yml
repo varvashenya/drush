@@ -14,8 +14,8 @@ executors:
       - image: wodby/php:8.3
         environment:
           - MYSQL_HOST=127.0.0.1
-          - UNISH_DB_URL=mysql://root:@127.0.0.1
-      - image: circleci/mysql:5.7.31
+          - UNISH_DB_URL=mysql://root:@127.0.0.1/unish_dev?module=mysql
+      - image: cimg/mysql:8.0
 
 commands:
   prepare_php:
@@ -43,7 +43,6 @@ jobs:
     executor: << parameters.os >>
     environment:
       UNISH_NO_TIMEOUTS: y
-      UNISH_DB_URL: mysql://root:@127.0.0.1
       UNISH_DRUPAL_VERSION: << parameters.drupal >>
     steps:
       - checkout
