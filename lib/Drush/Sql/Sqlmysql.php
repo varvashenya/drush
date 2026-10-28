@@ -2,7 +2,9 @@
 
 namespace Drush\Sql;
 
+use Drush\Log\LogLevel;
 use PDO;
+use Symfony\Component\Process\Process;
 
 class Sqlmysql extends SqlBase {
 
@@ -112,13 +114,37 @@ EOT;
     return $return;
   }
 
+  /**
+   * List the tables in the database.
+   *
+   * The client is run through Symfony Process rather than drush_shell_exec()
+   * so that stdout is read separately from stderr. drush_shell_exec() merges
+   * the two (2>&1), which lets client warnings (e.g. MariaDB's "mysql:
+   * Deprecated program name" notice) end up in the list as bogus table names.
+   *
+   * @return string[]
+   *   The table names. An empty array if the query fails.
+   */
   public function listTables() {
-    $current = drush_get_context('DRUSH_SIMULATE');
-    drush_set_context('DRUSH_SIMULATE', FALSE);
-    $return = $this->query('SHOW TABLES;');
-    $tables = drush_shell_exec_output();
-    drush_set_context('DRUSH_SIMULATE', $current);
-    return $tables;
+    $command = implode(' ', array_filter([
+      $this->command(),
+      $this->creds(),
+      $this->silent(),
+      drush_get_option('extra', $this->query_extra),
+    ]));
+
+    $process = Process::fromShellCommandline($command);
+    $process->setTimeout(NULL);
+    $process->setInput('SHOW TABLES;');
+    $process->run();
+
+    if (!$process->isSuccessful()) {
+      drush_log(dt('Failed to list tables: !error', ['!error' => trim($process->getErrorOutput())]), LogLevel::WARNING);
+      return [];
+    }
+
+    $tables = preg_split('/\R/', $process->getOutput(), -1, PREG_SPLIT_NO_EMPTY);
+    return array_map('rtrim', $tables);
   }
 
   public function listTablesQuoted() {
