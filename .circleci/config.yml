@@ -16,6 +16,13 @@ executors:
           - MYSQL_HOST=127.0.0.1
           - UNISH_DB_URL=mysql://root:@127.0.0.1
       - image: cimg/mysql:8.0
+  linux83-mariadb:
+    docker:
+      - image: wodby/php:8.3
+        environment:
+          - MYSQL_HOST=127.0.0.1
+          - UNISH_DB_URL=mysql://root:@127.0.0.1
+      - image: cimg/mariadb:11.4
 
 commands:
   prepare_php:
@@ -58,3 +65,7 @@ workflows:
           name: test-drupal-7-php-8.3
           drupal: "7"
           os: linux83
+      - test:
+          name: test-drupal-7-php-8.3-mariadb
+          drupal: "7"
+          os: linux83-mariadb
