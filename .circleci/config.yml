@@ -14,7 +14,7 @@ executors:
       - image: wodby/php:8.3
         environment:
           - MYSQL_HOST=127.0.0.1
-          - UNISH_DB_URL=mysql://root:@127.0.0.1/unish_dev?module=mysql
+          - UNISH_DB_URL=mysql://root:@127.0.0.1
       - image: cimg/mysql:8.0
 
 commands:
@@ -48,8 +48,7 @@ jobs:
       - checkout
       - prepare_php
       - run: composer install --prefer-dist --no-interaction
-      - run: if [[ -n "$(php --version | grep 'PHP 8')" ]] ; then composer config --unset platform.php && composer remove --dev --no-update symfony/var-dumper && composer update symfony/var-dumper phpunit/phpunit --with-dependencies ; fi
-      - run: vendor/bin/phpunit
+      - run: vendor/bin/phpunit --testsuite all
 
 workflows:
   build_test:
