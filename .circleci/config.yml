@@ -50,7 +50,7 @@ jobs:
       - prepare_php
       - run: composer install --prefer-dist --no-interaction
       - run: if [[ -n "$(php --version | grep 'PHP 8')" ]] ; then composer config --unset platform.php && composer remove --dev --no-update symfony/var-dumper && composer update symfony/var-dumper phpunit/phpunit --with-dependencies ; fi
-      - run: vendor/bin/phpunit --configuration tests
+      - run: vendor/bin/phpunit
 
 workflows:
   build_test:
