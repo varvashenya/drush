@@ -60,6 +60,12 @@ class SqlBase {
   public function dump($file = '') {
     $file_suffix = '';
     $table_selection = $this->get_expanded_table_selection();
+    // If the tables could not be listed, the selection is unreliable (an empty
+    // list would dump the whole database, including excluded tables). The
+    // error has already been reported by listTables().
+    if (drush_cmp_error('DRUSH_SQL_LIST_TABLES_FAILED')) {
+      return FALSE;
+    }
     $file = $this->dumpFile($file);
     $cmd = $this->dumpCmd($table_selection);
     // Gzip the output from dump command(s) if requested.
