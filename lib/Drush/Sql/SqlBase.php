@@ -324,6 +324,11 @@ class SqlBase {
    */
   public function get_expanded_table_selection() {
     $table_selection = drush_sql_get_table_selection();
+    // Without any skip/structure/tables selection there is nothing to expand,
+    // so don't list the tables (an unfiltered dump doesn't depend on it).
+    if (!array_filter($table_selection)) {
+      return $table_selection;
+    }
     // Get the existing table names in the specified database.
     $db_tables = $this->listTables();
     if (isset($table_selection['skip'])) {
